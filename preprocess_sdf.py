@@ -136,14 +136,14 @@ def main():
     parser.add_argument("--dataset_dir", type=str,
                         default="../grasp-dataset-gen/output_hf",
                         help="Directory containing dataset index")
-    parser.add_argument("--output_dir", type=str,
+    parser.add_argument("--sdf_cache_dir", type=str,
                         default="data/sdf_cache",
                         help="Output directory for SDF .npz files")
     parser.add_argument("--n_points", type=int, default=100_000,
                         help="Number of query points per object")
     args = parser.parse_args()
 
-    os.makedirs(args.output_dir, exist_ok=True)
+    os.makedirs(args.sdf_cache_dir, exist_ok=True)
 
     # Load dataset index to know which objects to process
     index_path = os.path.join(args.dataset_dir, "dataset_index.json")
@@ -153,7 +153,7 @@ def main():
     objects = index["objects"]
     print(f"📐 Processing {len(objects)} objects → SDF ground truth")
     print(f"   GLB dir: {args.glb_dir}")
-    print(f"   Output:  {args.output_dir}")
+    print(f"   Output:  {args.sdf_cache_dir}")
     print(f"   Points:  {args.n_points:,}")
     print()
 
@@ -161,7 +161,7 @@ def main():
     for obj in tqdm(objects, desc="Computing SDF"):
         name = obj["mesh"]
         glb_path = os.path.join(args.glb_dir, f"{name}.glb")
-        output_path = os.path.join(args.output_dir, f"{name}.npz")
+        output_path = os.path.join(args.sdf_cache_dir, f"{name}.npz")
 
         if os.path.exists(output_path):
             tqdm.write(f"  ✓ {name} (cached)")
