@@ -311,6 +311,7 @@ def main():
                         default="data/sdf_cache")
     parser.add_argument("--eval_every", type=int, default=5)
     parser.add_argument("--save_every", type=int, default=50)
+    parser.add_argument("--resume", type=str, default=None, help="Path to checkpoint.pt to resume from")
     args = parser.parse_args()
 
     # Device
@@ -373,6 +374,18 @@ def main():
         "sdf_loss": [], "contact_loss": [], "eikonal_loss": [],
         "lr": [], "per_category_iou": [],
     }
+    start_epoch = 1
+
+    # Resume if requested
+    if args.resume and os.path.exists(args.resume):
+        print(f"🔄 Resuming from checkpoint: {args.resume}")
+        checkpoint = torch.load(args.resume, map_location=device)
+        model.load_state_dict(checkpoint["model_state_dict"])
+        optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
+        start_epoch = checkpoint["epoch"] + 1
+        if "history" in checkpoint:
+            history = checkpoint["history"]
+        print(f"   Continuing from epoch {start_epoch}")
 
     best_iou = 0.0
     print(f"\n🚀 Training for {args.epochs} epochs")
@@ -381,7 +394,7 @@ def main():
     print(f"   Output: {run_dir}")
     print()
 
-    for epoch in range(1, args.epochs + 1):
+    for epoch in range(start_epoch, args.epochs + 1):
         # Train
         train_metrics = train_one_epoch(
             model, train_loader, optimizer, device, epoch,
