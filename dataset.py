@@ -155,6 +155,11 @@ class TactileSDFDataset(Dataset):
 
         # Load contacts
         contacts = self._load_contacts(name, strategy)
+
+        # Data Augmentation: Add small jitter to contact positions (first 3 columns)
+        # This helps prevent overfitting on specific contact coordinates
+        jitter = np.random.normal(0, 0.005, size=(contacts.shape[0], 3)).astype(np.float32)
+        contacts[:, :3] += jitter
         contacts = self._normalize_contacts(
             contacts, sdf_data["center"], sdf_data["scale"]
         )
