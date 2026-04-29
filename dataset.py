@@ -49,7 +49,7 @@ class TactileSDFDataset(Dataset):
         self.sdf_cache_dir = sdf_cache_dir
         self.split = split
         self.n_query_points = n_query_points
-        self.strategies = strategies or ["front_back", "left_right", "right_left"]
+        self.strategies = strategies or ["front_back", "left_right", "right_left", "random_1", "random_2"]
 
         # Load dataset index
         index_path = os.path.join(dataset_dir, "dataset_index.json")
